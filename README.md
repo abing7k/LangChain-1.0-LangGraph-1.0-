@@ -1,4 +1,5 @@
-LangChain 1.0 & LangGraph 1.0 八周从零到精通（附22个实战模块 + 3大项目完整源码）
+# LangChain 1.0 & LangGraph 1.0 八周从零到精通
+（附22个实战模块 + 3大项目完整源码）
 
 课程亮点
  最新版本：基于2025年10月发布的LangChain 1.0正式版，使用最新的create_agent API，告别过时教程。
