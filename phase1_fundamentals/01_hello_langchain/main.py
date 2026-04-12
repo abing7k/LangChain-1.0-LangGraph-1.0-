@@ -26,26 +26,30 @@ from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 load_dotenv()
 
 # 验证 API 密钥是否存在
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-if not GROQ_API_KEY:
+API_KEY = os.getenv("API_KEY")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
+BASE_URL = os.getenv("BASE_URL")
+PROVIDER = os.getenv("PROVIDER")
+
+if not API_KEY:
     raise ValueError(
         "\n" + "="*70 + "\n"
-        "❌ 错误：未找到 GROQ_API_KEY 环境变量！\n"
+        "❌ 错误：未找到 API_KEY 环境变量！\n"
         "="*70 + "\n"
         "请按照以下步骤设置 API 密钥：\n\n"
         "1️⃣ 访问 https://console.groq.com/keys 获取免费 API 密钥\n"
         "2️⃣ 复制 .env.example 为 .env\n"
         "   命令：cp .env.example .env\n"
         "3️⃣ 在 .env 文件中填入你的 Groq API Key：\n"
-        "   GROQ_API_KEY=gsk_your_actual_key_here\n"
+        "   API_KEY=gsk_your_actual_key_here\n"
         "4️⃣ 重新运行程序\n"
         "="*70
     )
 
 # 验证 API 密钥格式（Groq API key 通常以 gsk_ 开头）
-if not GROQ_API_KEY.startswith("gsk_"):
-    print("\n" + "⚠️  警告：你的 GROQ_API_KEY 格式可能不正确")
-    print("   Groq API 密钥通常以 'gsk_' 开头")
+if not API_KEY.startswith("sk-"):
+    print("\n" + "⚠️  警告：你的 API_KEY 格式可能不正确")
+    print("   Groq API 密钥通常以 'sk-' 开头")
     print("   请确认你从 https://console.groq.com/keys 获取了正确的密钥\n")
 
 
@@ -67,8 +71,10 @@ def example_1_simple_invoke():
     # 初始化模型
     # 格式：init_chat_model("提供商:模型名称")
     model = init_chat_model(
-        "groq:llama-3.3-70b-versatile",  # Groq 提供的 Llama 3.3 模型
-        api_key=GROQ_API_KEY
+        DEFAULT_MODEL,
+        api_key=API_KEY,
+        base_url=BASE_URL,
+        model_provider=PROVIDER
     )
 
     # 使用字符串直接调用模型
@@ -99,8 +105,10 @@ def example_2_messages():
     print("="*70)
 
     model = init_chat_model(
-        "groq:llama-3.3-70b-versatile",
-        api_key=GROQ_API_KEY
+        DEFAULT_MODEL,
+        api_key=API_KEY,
+        base_url=BASE_URL,
+        model_provider=PROVIDER
     )
 
     # 构建消息列表
@@ -146,8 +154,10 @@ def example_3_dict_messages():
     print("="*70)
 
     model = init_chat_model(
-        "groq:llama-3.3-70b-versatile",
-        api_key=GROQ_API_KEY
+        DEFAULT_MODEL,
+        api_key=API_KEY,
+        base_url=BASE_URL,
+        model_provider=PROVIDER
     )
 
     # 使用字典格式构建消息
@@ -186,8 +196,10 @@ def example_4_model_parameters():
 
     # 创建一个温度较低的模型（更确定性）
     model_deterministic = init_chat_model(
-        "groq:llama-3.3-70b-versatile",
-        api_key=GROQ_API_KEY,
+        DEFAULT_MODEL,
+        api_key=API_KEY,
+        base_url=BASE_URL,
+        model_provider=PROVIDER,
         temperature=0.0,  # 最确定性
         max_tokens=100    # 限制输出长度
     )
@@ -206,8 +218,10 @@ def example_4_model_parameters():
 
     # 创建一个温度较高的模型（更随机）
     model_creative = init_chat_model(
-        "groq:llama-3.3-70b-versatile",
-        api_key=GROQ_API_KEY,
+        DEFAULT_MODEL,
+        api_key=API_KEY,
+        base_url=BASE_URL,
+        model_provider=PROVIDER,
         temperature=1.5,  # 更有创造性
         max_tokens=100
     )
@@ -238,8 +252,10 @@ def example_5_response_structure():
     print("="*70)
 
     model = init_chat_model(
-        "groq:llama-3.3-70b-versatile",
-        api_key=GROQ_API_KEY
+        DEFAULT_MODEL,
+        api_key=API_KEY,
+        base_url=BASE_URL,
+        model_provider=PROVIDER
     )
 
     response = model.invoke("解释一下什么是递归？用一句话。")
@@ -282,8 +298,10 @@ def example_6_error_handling():
 
     try:
         model = init_chat_model(
-            "groq:llama-3.3-70b-versatile",
-            api_key=GROQ_API_KEY
+            DEFAULT_MODEL,
+            api_key=API_KEY,
+            base_url=BASE_URL,
+            model_provider=PROVIDER
         )
 
         response = model.invoke("Hello! How are you?")
@@ -317,8 +335,8 @@ def example_7_multiple_models():
 
     # Groq 上可用的不同模型
     models_to_test = [
-        "groq:llama-3.3-70b-versatile",
-        "groq:mixtral-8x7b-32768",
+        "qwen-3-235b-a22b-instruct-2507",
+        "qwen/qwq-32b",
     ]
 
     prompt = "用一句话解释什么是机器学习。"
@@ -331,7 +349,9 @@ def example_7_multiple_models():
 
             model = init_chat_model(
                 model_name,
-                api_key=GROQ_API_KEY,
+                api_key=API_KEY,
+                base_url=BASE_URL,
+                model_provider=PROVIDER,
                 temperature=0.7
             )
 

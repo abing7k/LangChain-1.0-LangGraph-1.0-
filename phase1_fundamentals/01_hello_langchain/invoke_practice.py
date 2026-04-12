@@ -12,14 +12,23 @@ from langchain.chat_models import init_chat_model
 
 # 加载环境变量
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+PROVIDER = os.getenv("PROVIDER")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here_replace_this":
-    print("请先在 .env 文件中设置有效的 GROQ_API_KEY")
+
+
+if not API_KEY or API_KEY == "your_API_KEY_here_replace_this":
+    print("请先在 .env 文件中设置有效的 API_KEY")
     exit(1)
 
 # 初始化模型
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+model = init_chat_model(
+    DEFAULT_MODEL,
+    api_key=API_KEY,
+    base_url=BASE_URL,
+    model_provider=PROVIDER)
 
 print("="*70)
 print(" invoke 方法深入实践")
@@ -264,12 +273,24 @@ def exercise_5_response_structure():
 
     # 4. Token 使用情况
     print("【4. Token 使用情况】")
+    print("metadata:", metadata)
     usage = metadata.get('token_usage', {})
     print(f"输入 tokens：{usage.get('prompt_tokens')}")
     print(f"输出 tokens：{usage.get('completion_tokens')}")
     print(f"总计 tokens：{usage.get('total_tokens')}")
-    print(f"输入处理时间：{usage.get('prompt_time'):.4f} 秒")
-    print(f"输出生成时间：{usage.get('completion_time'):.4f} 秒\n")
+    prompt_time = usage.get('prompt_time')
+    completion_time = usage.get('completion_time')
+
+    if prompt_time is not None:
+        print(f"输入处理时间：{prompt_time:.4f} 秒")
+    else:
+        print("输入处理时间：未提供")
+
+    if completion_time is not None:
+        print(f"输出生成时间：{completion_time:.4f} 秒\n")
+    else:
+        print("输出生成时间：未提供\n")
+
 
     # 5. 计算成本（示例）
     print("【5. 成本估算（假设每千tokens $0.1）】")
@@ -321,6 +342,7 @@ def exercise_6_chatbot():
 
         # 调用模型
         response = model.invoke(conversation)
+
 
         # 显示 AI 回复
         print(f"AI：{response.content}")
