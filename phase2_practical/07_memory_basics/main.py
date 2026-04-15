@@ -2,7 +2,7 @@
 LangChain 1.0 - Memory Basics (内存管理基础)
 ==========================================
 
-本模块重点讲解��
+本模块重点讲解
 1. InMemorySaver - LangGraph 提供的内存管理
 2. checkpointer 参数 - 为 Agent 添加内存
 3. thread_id - 会话管理
@@ -16,14 +16,19 @@ from langchain.agents import create_agent
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import InMemorySaver
 
+
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+PROVIDER = os.getenv("PROVIDER")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here_replace_this":
-    raise ValueError("请先设置 GROQ_API_KEY")
 
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
 
+model = init_chat_model(DEFAULT_MODEL,
+                        api_key=API_KEY,
+                        base_url=BASE_URL,
+                        model_provider=PROVIDER,)
 # 创建一个简单的工具
 @tool
 def get_user_info(user_id: str) -> str:

@@ -15,12 +15,21 @@ from langchain.agents import create_agent
 from calculator import calculator
 
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here_replace_this":
-    raise ValueError("请先设置 GROQ_API_KEY")
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+PROVIDER = os.getenv("PROVIDER")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
 
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+
+
+if not API_KEY or API_KEY == "your_API_KEY_here_replace_this":
+    raise ValueError("请先设置 API_KEY")
+
+model = init_chat_model(DEFAULT_MODEL,
+                        api_key=API_KEY,
+                        base_url=BASE_URL,
+                        model_provider=PROVIDER,)
 
 print("=" * 70)
 print("测试：Agent 执行循环")
@@ -30,7 +39,7 @@ agent = create_agent(model=model, tools=[calculator])
 
 print("\n问题：10 加 20 等于多少？")
 response = agent.invoke({
-    "messages": [{"role": "user", "content": "10 加 20 等于多��？"}]
+    "messages": [{"role": "user", "content": "10 加 20 等于多少？"}]
 })
 
 print("\n完整消息历史：")

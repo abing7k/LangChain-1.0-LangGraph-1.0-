@@ -21,15 +21,22 @@ from langchain.chat_models import init_chat_model
 from langchain.agents import create_agent
 from calculator import calculator
 from weather import get_weather
-
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here_replace_this":
-    raise ValueError("请先设置 GROQ_API_KEY")
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+PROVIDER = os.getenv("PROVIDER")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
 
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
 
+
+if not API_KEY or API_KEY == "your_API_KEY_here_replace_this":
+    raise ValueError("请先设置 API_KEY")
+
+model = init_chat_model(DEFAULT_MODEL,
+                        api_key=API_KEY,
+                        base_url=BASE_URL,
+                        model_provider=PROVIDER,)
 
 # ============================================================================
 # 示例 1：理解执行循环 - 查看完整消息历史

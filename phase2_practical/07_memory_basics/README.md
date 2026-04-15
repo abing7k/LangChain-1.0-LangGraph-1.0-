@@ -70,7 +70,7 @@ agent = create_agent(
 ```
 
 **注意**：
-- `InMemorySaver` - ��存中保存（进程结束就丢失）
+- `InMemorySaver` - 内存中保存（进程结束就丢失）
 - 后续会学习持久化（SQLite、Postgres）
 
 ### thread_id

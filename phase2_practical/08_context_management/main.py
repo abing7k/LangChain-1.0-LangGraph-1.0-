@@ -18,12 +18,17 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langchain.agents.middleware import SummarizationMiddleware
 
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+PROVIDER = os.getenv("PROVIDER")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here_replace_this":
-    raise ValueError("请先设置 GROQ_API_KEY")
 
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+
+model = init_chat_model(DEFAULT_MODEL,
+                        api_key=API_KEY,
+                        base_url=BASE_URL,
+                        model_provider=PROVIDER)
 
 @tool
 def calculator(operation: str, a: float, b: float) -> str:
@@ -104,8 +109,8 @@ def example_2_summarization_middleware():
         checkpointer=InMemorySaver(),
         middleware=[
             SummarizationMiddleware(
-                model="groq:llama-3.3-70b-versatile",
-                max_tokens_before_summary=500  # 超过 500 tokens 就摘要
+                model=model,
+                trigger=("tokens",500) # 超过 500 tokens 就摘要
             )
         ]
     )
@@ -154,7 +159,7 @@ SummarizationMiddleware 参数：
    - 用于生成摘要的模型
    - 可以用便宜的模型（如 gpt-3.5）降低成本
 
-2. max_tokens_before_summary
+2. trigger=("tokens", 800)
    - 触发摘要的 token 数阈值
    - 默认: 1000
    - 建议：根据模型上下文窗口设置（如 4k 模型设为 3000）
@@ -171,7 +176,7 @@ agent = create_agent(
     middleware=[
         SummarizationMiddleware(
             model="groq:llama-3.3-70b-versatile",  # 摘要模型
-            max_tokens_before_summary=500,         # 500 tokens 触发
+            trigger=("tokens", 500),         # 500 tokens 触发
         )
     ],
     checkpointer=InMemorySaver()
@@ -217,7 +222,7 @@ def example_4_manual_trimming():
 
     trimmed = trim_messages(
         messages,
-        max_count=5,  # 严格保留最后 5 条消息
+        max_tokens=100,  # 严格保留最后 5 条消息
         # max_tokens=100,  # 或使用 token 数限制
         strategy="last",  # 保留最后的消息
         token_counter=len  # 简单计数器（实际应该用 token 计数）这里其实不会被用到，因为 max_count 优先
@@ -313,8 +318,8 @@ def example_6_practical_customer_service():
         checkpointer=InMemorySaver(),
         middleware=[
             SummarizationMiddleware(
-                model="groq:llama-3.3-70b-versatile",
-                max_tokens_before_summary=800  # 适合客服场景
+                model=model,
+                trigger=("tokens", 800)  # 适合客服场景
             )
         ]
     )
@@ -376,7 +381,7 @@ def main():
         print("\n核心要点：")
         print("  SummarizationMiddleware - 自动摘要（推荐）")
         print("  trim_messages - 手动修剪")
-        print("  max_tokens_before_summary - 触发阈值")
+        print("  trigger=(\"tokens\", 800\n)  - 触发阈值")
         print("  middleware 在 create_agent 中配置")
         print("\n下一步：")
         print("  09_checkpointing - 持久化对话状态")
