@@ -19,12 +19,31 @@ from enum import Enum
 import time
 
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+PROVIDER = os.getenv("PROVIDER")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here_replace_this":
-    raise ValueError("请先设置 GROQ_API_KEY")
+model = init_chat_model(
+    DEFAULT_MODEL,
+    api_key=API_KEY,
+    base_url=BASE_URL,
+    model_provider=PROVIDER
+)
 
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+
+API_KEY2 = os.getenv("API_KEY2")
+BASE_URL2 = os.getenv("BASE_URL2")
+PROVIDER2 = os.getenv("PROVIDER2")
+DEFAULT_MODEL2 = os.getenv("DEFAULT_MODEL2")
+
+model2 = init_chat_model(
+    DEFAULT_MODEL2,
+    api_key=API_KEY2,
+    base_url=BASE_URL2,
+    model_provider=PROVIDER2
+)
+
 
 
 # ============================================================================
@@ -83,14 +102,14 @@ def example_2_with_fallbacks():
     primary_model = model
 
     # 备用模型（更可靠或更便宜）
-    fallback_model = init_chat_model("groq:llama-3.1-8b-instant", api_key=GROQ_API_KEY)
+    fallback_model = model2
 
     # 配置降级
     llm_with_fallbacks = primary_model.with_fallbacks([fallback_model])
 
     print("\n配置:")
-    print("  - 主模型: llama-3.3-70b-versatile")
-    print("  - 备用模型: llama-3.1-8b-instant")
+    print("  - 主模型: openai")
+    print("  - 备用模型: deepseek")
 
     try:
         response = llm_with_fallbacks.invoke("用一句话介绍 Python")
@@ -440,7 +459,7 @@ def example_7_combined():
     structured_primary = model.with_structured_output(ExtractedData)
 
     # 2. 配置备用模型（也要先创建结构化输出）
-    fallback_model = init_chat_model("groq:llama-3.1-8b-instant", api_key=GROQ_API_KEY)
+    fallback_model = model2
     structured_fallback = fallback_model.with_structured_output(ExtractedData)
 
     # 3. 添加重试（在结构化输出之后）

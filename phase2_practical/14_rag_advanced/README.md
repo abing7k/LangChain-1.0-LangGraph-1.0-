@@ -30,7 +30,7 @@ python 14_rag_advanced/test.py
 
 **混合检索解决方案**：向量搜索 + BM25 = 全面覆盖
 
-## 1. 向量检索 vs BM25 ���索
+## 1. 向量检索 vs BM25 检索
 
 ### 向量检索（Vector Search / Semantic Search）
 

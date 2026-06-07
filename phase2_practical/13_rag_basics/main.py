@@ -31,11 +31,19 @@ DATA_DIR = SCRIPT_DIR / "data"
 DATA_DIR.mkdir(exist_ok=True)
 
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+PROVIDER = os.getenv("PROVIDER")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here_replace_this":
-    raise ValueError("请先设置 GROQ_API_KEY")
+model = init_chat_model(
+    DEFAULT_MODEL,
+    api_key=API_KEY,
+    base_url=BASE_URL,
+    model_provider=PROVIDER
+)
+
 
 if not PINECONE_API_KEY or PINECONE_API_KEY == "your_pinecone_api_key_here":
     print("\n[警告] 未设置 PINECONE_API_KEY")
@@ -45,7 +53,6 @@ if not PINECONE_API_KEY or PINECONE_API_KEY == "your_pinecone_api_key_here":
     print("3. 在 .env 文件中设置 PINECONE_API_KEY=你的key")
     print("\n当前将跳过需要 Pinecone 的示例\n")
 
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
 
 
 # ============================================================================
@@ -386,7 +393,7 @@ def example_6_rag_qa(vectorstore):
 3. 如果知识库中没有相关信息，诚实告知"""
     )
 
-    # 测试��答
+    # 测试回答
     questions = [
         "LangChain 有哪些核心组件？",
         "RAG 是什么？",

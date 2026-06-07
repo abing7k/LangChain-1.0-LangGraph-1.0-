@@ -19,12 +19,18 @@ from langchain.agents.middleware import AgentMiddleware
 from langgraph.checkpoint.memory import InMemorySaver
 
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+PROVIDER = os.getenv("PROVIDER")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here_replace_this":
-    raise ValueError("请先设置 GROQ_API_KEY")
 
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+
+model = init_chat_model(DEFAULT_MODEL,
+                        api_key=API_KEY,
+                        base_url=BASE_URL,
+                        model_provider=PROVIDER)
+
 
 @tool
 def get_weather(city: str) -> str:
@@ -262,7 +268,7 @@ class OutputValidationMiddleware(AgentMiddleware):
         content = getattr(last_message, 'content', '')
 
         if len(content) > self.max_length:
-            print(f"\n[警告] 响应���长 ({len(content)} 字符)，已截断到 {self.max_length}")
+            print(f"\n[警告] 响应时长 ({len(content)} 字符)，已截断到 {self.max_length}")
             # 这里可以实现截断或重试逻辑
 
         return None
@@ -459,8 +465,8 @@ def example_7_builtin_middleware():
         tools=[],
         middleware=[
             SummarizationMiddleware(
-                model="groq:llama-3.3-70b-versatile",
-                max_tokens_before_summary=200  # 超过 200 token 就摘要
+                model=model,
+                trigger=("tokens", "200"),  # 超过 200 token 就摘要
             )
         ],
         checkpointer=InMemorySaver()
@@ -498,17 +504,17 @@ def main():
     print("="*70)
 
     try:
-        # example_1_basic_middleware()
-        # input("\n按 Enter 继续...")
+        example_1_basic_middleware()
+        input("\n按 Enter 继续...")
 
-        # example_2_state_modification()
-        # input("\n按 Enter 继续...")
+        example_2_state_modification()
+        input("\n按 Enter 继续...")
 
-        # example_3_message_trimming()
-        # input("\n按 Enter 继续...")
+        example_3_message_trimming()
+        input("\n按 Enter 继续...")
 
-        # example_4_output_validation()
-        # input("\n按 Enter 继续...")
+        example_4_output_validation()
+        input("\n按 Enter 继续...")
 
         example_5_multiple_middleware()
         input("\n按 Enter 继续...")

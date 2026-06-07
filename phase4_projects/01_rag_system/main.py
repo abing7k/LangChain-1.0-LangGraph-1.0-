@@ -36,37 +36,38 @@ from langchain_core.vectorstores import InMemoryVectorStore
 from langgraph.graph import StateGraph, START, END
 
 # 加载环境变量
+# 加载环境变量
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here":
-    raise ValueError(
-        "\n请先在 .env 文件中设置有效的 GROQ_API_KEY\n"
-        "访问 https://console.groq.com/keys 获取免费密钥"
-    )
-
-# 初始化模型
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
-
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+PROVIDER = os.getenv("PROVIDER")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
+LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
+# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+model = init_chat_model(
+    DEFAULT_MODEL,
+    api_key=API_KEY,
+    base_url=BASE_URL,
+    model_provider=PROVIDER
+)
 
 # ==================== 简单 Embeddings（用于演示）====================
 
 class SimpleEmbeddings(Embeddings):
     """
     简单的 Embeddings 实现（用于演示）
-    
+
     使用简单的词频统计生成向量，适合演示目的。
     生产环境请使用 OpenAI 或 HuggingFace Embeddings。
     """
-    
+
     def __init__(self, dimension: int = 384):
         self.dimension = dimension
-    
+
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """嵌入文档列表"""
         return [self._embed_text(text) for text in texts]
-    
+
     def embed_query(self, text: str) -> List[float]:
         """嵌入查询"""
         return self._embed_text(text)
@@ -89,17 +90,22 @@ class SimpleEmbeddings(Embeddings):
         return vector
 
 
-# 选择 Embeddings
+# # 选择 Embeddings
+# def get_embeddings():
+#     """根据环境选择合适的 Embeddings"""
+#     if OPENAI_API_KEY and OPENAI_API_KEY != "your_openai_api_key_here":
+#         try:
+#             from langchain_openai import OpenAIEmbeddings
+#             print("📊 使用 OpenAI Embeddings")
+#             return OpenAIEmbeddings(model="text-embedding-3-small")
+#         except ImportError:
+#             print("⚠️ langchain_openai 未安装，使用简单 Embeddings")
+#
+#     print("📊 使用简单 Embeddings（演示用）")
+#     return SimpleEmbeddings()
+
 def get_embeddings():
-    """根据环境选择合适的 Embeddings"""
-    if OPENAI_API_KEY and OPENAI_API_KEY != "your_openai_api_key_here":
-        try:
-            from langchain_openai import OpenAIEmbeddings
-            print("📊 使用 OpenAI Embeddings")
-            return OpenAIEmbeddings(model="text-embedding-3-small")
-        except ImportError:
-            print("⚠️ langchain_openai 未安装，使用简单 Embeddings")
-    
+    """使用简单 Embeddings，适合本地演示"""
     print("📊 使用简单 Embeddings（演示用）")
     return SimpleEmbeddings()
 

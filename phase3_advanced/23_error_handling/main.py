@@ -2,7 +2,7 @@
 模块 23：错误处理
 学习如何实现健壮的错误处理和恢复机制
 """
-
+import json
 import os
 import time
 import random
@@ -56,16 +56,17 @@ def safe_parse_json(text: str, default: dict = None) -> dict:
 
 # 加载环境变量
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here":
-    raise ValueError(
-        "\n请先在 .env 文件中设置有效的 GROQ_API_KEY\n"
-        "访问 https://console.groq.com/keys 获取免费密钥"
-    )
-
-# 初始化模型
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+PROVIDER = os.getenv("PROVIDER")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
+LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
+model = init_chat_model(
+    DEFAULT_MODEL,
+    api_key=API_KEY,
+    base_url=BASE_URL,
+    model_provider=PROVIDER
+)
 
     # 初始化模型
 
